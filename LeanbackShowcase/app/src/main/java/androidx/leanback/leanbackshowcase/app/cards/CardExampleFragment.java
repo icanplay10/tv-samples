@@ -122,12 +122,34 @@ public class CardExampleFragment extends BrowseFragment {
             case CardRow.TYPE_DEFAULT:
             default:
                 // Build main row using the ImageCardViewPresenter.
+                //TODO:CardPresenterSelector相当于card的选择器？
                 PresenterSelector presenterSelector = new CardPresenterSelector(getActivity());
                 ArrayObjectAdapter listRowAdapter = new ArrayObjectAdapter(presenterSelector);
                 for (Card card : cardRow.getCards()) {
                     listRowAdapter.add(card);
                 }
-                return new CardListRow(new HeaderItem(cardRow.getTitle()), listRowAdapter, cardRow);
+//                return new CardListRow(new HeaderItem(cardRow.getTitle()), listRowAdapter, cardRow);
+                HeaderItem headerItem = new HeaderItem(cardRow.getTitle());
+                /**
+                 * title:標題
+                 * description:子標題
+                 * contentDescription：一般用不到
+                 * TODO:
+                 * 1.首页里面并没有用到headerItem（详情页有用到），首页中抽象了模板的概念，此title作为了模板的一个view而存在
+                 * 2.那么官方的例子中，并没有抽象出模板的概念，他是怎么做到的呢？
+                 * 3.而且，官方的例子中，每一行都是可以右滑滚动的，层级上是否有消耗?
+                 */
+                headerItem.setDescription("setDescription");
+                headerItem.setContentDescription("setContentDescription");
+                /**
+                 * TODO
+                 * 1.ListRow是什么？
+                 * 2.ListRow里面包含了一个HorizontalGridView，集成了一个列表控件
+                 * 3.另外，发现在某一个行模板按住按键快速移动时，会省略中间选中的过程，直接跳转到最后一个，这是怎么做到的？
+                 *    看起来效果还可以，是否都是一样的实现，只是做了一个remove&&postDelay的逻辑？
+                 *    看起来流畅的原因是什么，布局没那么复杂？没有选中边框效果？我们的详情页相关推荐，看着明显卡顿，应该是做了按键减速的处理，流畅性需要看下是怎么保证的
+                 */
+            return new CardListRow(headerItem, listRowAdapter, cardRow);
         }
     }
 

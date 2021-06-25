@@ -19,11 +19,13 @@ import android.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.AnalogClock;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
@@ -51,6 +53,8 @@ import androidx.leanback.widget.RowPresenter;
 import androidx.leanback.widget.VerticalGridPresenter;
 
 import com.google.gson.Gson;
+
+import java.lang.reflect.Field;
 
 /**
  * Sample {@link BrowseFragment} implementation showcasing the use of {@link PageRow} and
@@ -103,6 +107,7 @@ public class PageAndListRowFragment extends BrowseFragment {
          * TODO：转场效果是如何实现的，目前的效果是
          * 1）侧边栏和内容区进入和退出时，有相应的动画；注释掉之后，进入的时候没有动画，但
          * 2）2000的时候有loading，1000的时候没有loading？
+         * 3）状态机搞的这么复杂，到底做了啥？
          */
         prepareEntranceTransition();
     }
@@ -115,10 +120,44 @@ public class PageAndListRowFragment extends BrowseFragment {
             @Override
             public void run() {
                 createRows();
+                /**
+                 * 经过此方法，会触发BaseFragment的onExecuteEntranceTransitiond方法，会经过view.invalidate();
+                 * 然后在addOnPreDrawListener做事情，为啥不直接在主线程做呢？有啥好处吗？
+                 *
+                 * 执行逻辑：
+                 * 1.父类onCreate中触发init->XX->XX，做了以下事情：
+                 *  1）loading条delay1秒后展示
+                 *  2）startEntranceTransition执行后，隐藏loading，加载过渡动画，过渡动画由上层可以执行
+                 */
                 startEntranceTransition();
+
+                View view = getView().findViewById(R.id.clock);
+                if (view != null) {
+                    test((AnalogClock)view);
+                } else {
+                    Log.e("zxd","view is null.");
+                }
             }
         }, 2000);
     }
+
+    private void test(AnalogClock clock) {
+        try {
+            Field field = AnalogClock.class.getDeclaredField("mMinuteHand");
+            field.setAccessible(true);
+            field.set(clock, getActivity().getDrawable(R.drawable.time_min_2));
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    /**
+     * 侧边栏header的效果是，按上下键内容也同步滚动，不仅仅是焦点移动，实现方式是：
+     * 1.左边整个是一个fragment，其中包含一个verticalGridView，当其中的item选中时，在其事件中，调用setSelectedPositionSmooth方法，将内容滚动
+     */
 
     private void createRows() {
         HeaderItem headerItem1 = new HeaderItem(HEADER_ID_1, HEADER_NAME_1);
