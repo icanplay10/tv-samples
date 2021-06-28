@@ -37,7 +37,7 @@ import android.view.ViewGroup;
  */
 public class GridFragment extends Fragment implements BrowseFragment.MainFragmentAdapterProvider {
     private static final String TAG = "VerticalGridFragment";
-    private static boolean DEBUG = false;
+    private static boolean DEBUG = true;
 
     private ObjectAdapter mAdapter;
     private VerticalGridPresenter mGridPresenter;
@@ -133,6 +133,7 @@ public class GridFragment extends Fragment implements BrowseFragment.MainFragmen
                 == null) {
             return;
         }
+        //TODO 这是做啥的，没看到有啥用啊
         if (!mGridViewHolder.getGridView().hasPreviousViewInSameRow(mSelectedPosition)) {
             mMainFragmentAdapter.getFragmentHost().showTitleView(true);
         } else {
@@ -167,6 +168,7 @@ public class GridFragment extends Fragment implements BrowseFragment.MainFragmen
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         ViewGroup gridDock = view.findViewById(R.id.browse_grid_dock);
+        //TODO:为什么要创建viewHolder，而不是view？仅仅是为了复用一些逻辑吗，比如里面的设置item的高度之类的？
         mGridViewHolder = mGridPresenter.onCreateViewHolder(gridDock);
         gridDock.addView(mGridViewHolder.view);
         mGridViewHolder.getGridView().setOnChildLaidOutListener(mChildLaidOutListener);

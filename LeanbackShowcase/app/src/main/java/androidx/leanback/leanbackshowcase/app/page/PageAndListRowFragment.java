@@ -219,6 +219,7 @@ public class PageAndListRowFragment extends BrowseFragment {
      */
     public static class SampleFragmentA extends GridFragment {
         private static final int COLUMNS = 4;
+        //调整推荐位的放大倍数
         private final int ZOOM_FACTOR = FocusHighlight.ZOOM_FACTOR_SMALL;
         private ArrayObjectAdapter mAdapter;
 
@@ -227,11 +228,16 @@ public class PageAndListRowFragment extends BrowseFragment {
             super.onCreate(savedInstanceState);
             setupAdapter();
             loadData();
+            //TODO:notifyDataReady这个是触发了个啥啊
             getMainFragmentAdapter().getFragmentHost().notifyDataReady(getMainFragmentAdapter());
         }
 
 
         private void setupAdapter() {
+            /**
+             * TODO:这里实际用到了gridView，但代码却用的VerticalGridPresenter？ VerticalGridPresenter封装或者定制到了什么程度？
+             * VerticalGridPresenter和GridFragment需要配合使用，GridFragment不在AAR中
+             */
             VerticalGridPresenter presenter = new VerticalGridPresenter(ZOOM_FACTOR);
             presenter.setNumberOfColumns(COLUMNS);
             setGridPresenter(presenter);
@@ -290,6 +296,7 @@ public class PageAndListRowFragment extends BrowseFragment {
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             createRows();
+            //TODO:notifyDataReady是为了干啥？通知给谁？
             getMainFragmentAdapter().getFragmentHost().notifyDataReady(getMainFragmentAdapter());
         }
 
@@ -349,6 +356,7 @@ public class PageAndListRowFragment extends BrowseFragment {
         }
 
         private ListRow createCardRow(CardRow cardRow) {
+            //TODO:SettingsIconPresenter嵌套封装了很多层，各个层级有的在page，有的在cards，包括cards、models的关系是怎么个情况
             SettingsIconPresenter iconCardPresenter = new SettingsIconPresenter(getActivity());
             ArrayObjectAdapter adapter = new ArrayObjectAdapter(iconCardPresenter);
             for(Card card : cardRow.getCards()) {
